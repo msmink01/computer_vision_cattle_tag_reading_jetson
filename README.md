@@ -54,7 +54,7 @@ Steps taken from [yolov5's jetson tutorial](https://github.com/ultralytics/yolov
    b. Edit *requirements.txt* so the lines regarding torch and torchvision are commented out.
       - *requirements.txt* should now contain ``# torch>=1.7.0`` and ``# torchvision>=0.8.1`` instead of ``torch>=1.7.0`` and ``torchvision>=0.8.1``
    
-   c. Install a dependency (make sure you are in your virtual environment).
+   c. Install a dependency.
       - ``$ sudo apt install -y libfreetype6-dev``
    
    d. Install the updated *requirements.txt* (make sure you are in your virtual environment).
@@ -64,7 +64,7 @@ Steps taken from [yolov5's jetson tutorial](https://github.com/ultralytics/yolov
 3. **Install torch and torchvision in your jetson**: \
 Steps taken from [yolov5's jetson tutorial](https://github.com/ultralytics/yolov5/issues/9627)
    
-   a. Install torch v1.12.0 using (nvidia's jetson-specific files)[https://forums.developer.nvidia.com/t/pytorch-for-jetson/72048].
+   a. Install torch v1.12.0 using (nvidia's jetson-specific files)[https://forums.developer.nvidia.com/t/pytorch-for-jetson/72048]
       - ``$ cd ~``
       - ``$ sudo apt-get install -y libopenblas-base libopenmpi-dev``
       - ``$ wget https://developer.download.nvidia.com/compute/redist/jp/v50/pytorch/torch-1.12.0a0+2c916ef.nv22.3-cp38-cp38-linux_aarch64.whl -O torch-1.12.0a0+2c916ef.nv22.3-cp38-cp38-linux_aarch64.whl``
@@ -78,6 +78,60 @@ Steps taken from [yolov5's jetson tutorial](https://github.com/ultralytics/yolov
       
    c. Check your installation of these packages using ``$ pip3 list``. If successful you should see the correct versions of torch/torchvision listed.
    
+   
+   
+4. **Install Deepstream Yolo Repository**: \
+Steps taken from [yolov5's jetson tutorial](https://github.com/ultralytics/yolov5/issues/9627)
+   
+   a. Clone the [Deepstream-Yolo repository](https://github.com/marcoslucianops/DeepStream-Yolo)
+      - ``$ cd ~``
+      - ``$ git clone https://github.com/marcoslucianops/DeepStream-Yolo``
+   
+   b. To convert your yolov5 pt file to cfg/wts file: copy the *DeepStream-Yolo/utils/gen_wts_yolov5.py* file to *yolov5* directory, and run the *gen_wts_yolov5.py* file with the pt model as input (if using pre-generated cfg/wts files, skip this step)
+      - ``$ cp DeepStream-Yolo/utils/gen_wts_yoloV5.py yolov5``
+      - ``$ cd yolov5``
+      - ``$ python3 gen_wts_yoloV5.py -w yolov5s.pt``
+      
+   c. Compile the Deepstream Yolo library
+      - ``cd ~/DeepStream-Yolo``
+      - ``CUDA_VER=11.4 make -C nvdsinfer_custom_impl_Yolo``
+      
+   d. You now have access to the DeepStream Yolo files that allow you to run Yolov5 models with non-customizable deepstream apps.
+   
+   
+   
+5. **Install Deepstream Python Apps**: \
+Steps taken from [Nvidia's deepstream python apps repo](https://github.com/NVIDIA-AI-IOT/deepstream_python_apps)
+   
+   a. Download the [v1.1.3 Deepstream Python Apps source code](https://github.com/NVIDIA-AI-IOT/deepstream_python_apps/releases/tag/v1.1.3) zip file to jetson and unzip it in the ``/opt/nvidia/deepstream/deepstream-6.1/sources`` directory. BEWARE: this directory is part of a protected section of the jetson files, any modifying commands will need to be sudo-ed
+      - ``$ cd /opt/nvidia/deepstream/deepstream-6.1/sources``
+      - ``$ sudo unzip name_of_file.zip``
+   
+   b. Make unzipped directory into a github repo: needed to install submodules
+      - ``$ cd deepstream_python_apps``
+      - ``$ sudo git init``
+      
+   c. Remove ``gst-python``/``pybind11`` directories (to be reinstalled in next step)
+      - ``$ cd 3rdparty``
+      - ``$ sudo rm -r gst-python``
+      - ``$ sudo rm -r pybind11``
+      
+   d. Reinstall ``gst-python`` as a submodule using [this particular version of the gst-python repo](https://github.com/GStreamer/gst-python/tree/1a8f48a6c2911b308231a3843f771a50775cbd2e)
+      - ``$ sudo git submodule add https://github.com/GStreamer/gst-python.git gst-python``
+      - ``cd gst-python``
+      - ``sudo git checkout 1a8f48a6c2911b308231a3843f771a50775cbd2e``
+      
+   e. Reinstall ``pybind11`` as a submodule using [this particular version of the pybind11 repo](https://github.com/pybind/pybind11/tree/3b1dbebabc801c9cf6f0953a4c20b904d444f879)
+      - ``$ sudo git submodule add https://github.com/pybind/pybind11.git pybind11``
+      - ``cd pybind11``
+      - ``sudo git checkout 3b1dbebabc801c9cf6f0953a4c20b904d444f879``
+      
+   f. Follow instructions in bindings/README.md (Ubuntu 20.04 track)
+...
+   
+
+
+
 
 ***
 ### References
