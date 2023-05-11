@@ -128,10 +128,31 @@ Steps taken from [Nvidia's deepstream python apps repo](https://github.com/NVIDI
       
    f. Follow instructions in bindings/README.md (Ubuntu 20.04 track)
 ...
-   
+Dependencies for deepstream_python_apps
+sudo apt install python3-gi python3-dev python3-gst-1.0 python-gi-dev git python-dev \
+    python3 python3-pip python3.8-dev cmake g++ build-essential libglib2.0-dev \
+    libglib2.0-dev-bin libgstreamer1.0-dev libtool m4 autoconf automake libgirepository1.0-dev libcairo2-dev
 
+Build gst-python things
+cd 3rdparty/gst-python/
+sudo ./autogen.sh
+sudo make
+sudo make install
 
+Build python deepstream bindings
+cd deepstream_python_apps/bindings
+sudo mkdir build
+cd build
+sudo cmake ..  -DPYTHON_MAJOR_VERSION=3 -DPYTHON_MINOR_VERSION=8 \
+    -DPIP_PLATFORM=linux_aarch64 -DDS_PATH=/opt/nvidia/deepstream/deepstream-6.1/
+sudo make
 
+Install the pip wheel
+pip3 install ./pyds-1.1.3-py3-none*.whl
+
+No dependencies for text needed...
+
+Download files above and run with them
 
 ***
 ### References
